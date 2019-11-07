@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Gumery&#39;s Blog">
 <meta property="og:description" content="Redis的持久化Redis有两种持久化的方式：快照（RDB文件）和追加式文件（AOF文件）：  RDB持久化方式会在一个特定的间隔保存那个时间点的一个数据快照。 AOF持久化方式则会记录每一个服务器收到的写操作。在服务启动时，这些记录的操作会逐条执行从而重建出原来的数据。写操作命令记录的格式跟Redis协议一致，以追加的方式进行保存。 Redis的持久化是可以禁用的，就是说你可以让数据的生命周期">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-10-25T08:09:30.332Z">
+<meta property="og:updated_time" content="2019-11-07T10:12:10.557Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis持久化">
 <meta name="twitter:description" content="Redis的持久化Redis有两种持久化的方式：快照（RDB文件）和追加式文件（AOF文件）：  RDB持久化方式会在一个特定的间隔保存那个时间点的一个数据快照。 AOF持久化方式则会记录每一个服务器收到的写操作。在服务启动时，这些记录的操作会逐条执行从而重建出原来的数据。写操作命令记录的格式跟Redis协议一致，以追加的方式进行保存。 Redis的持久化是可以禁用的，就是说你可以让数据的生命周期">
@@ -349,6 +349,7 @@
 <li>Redis的持久化是可以禁用的，就是说你可以让数据的生命周期只存在于服务器的运行时间里。</li>
 <li>两种方式的持久化是可以同时存在的，但是当Redis重启时，AOF文件会被优先用于重建数据。</li>
 </ul>
+<a id="more"></a>
 <h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><ul>
 <li>Redis调用fork()，产生一个子进程。</li>
 <li>子进程把数据写到一个临时的RDB文件。</li>
@@ -516,6 +517,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/11/07/批量手机号请求短信服务/" rel="prev" title="批量手机号请求短信服务">
+                批量手机号请求短信服务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -591,7 +596,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -602,7 +607,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -613,7 +618,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
