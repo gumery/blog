@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="openssl_encrypt,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、DES介绍DES 是对称性加密里面常见一种，全称为 Data Encryption Standard，即数据加密标准，是一种使用密钥加密的块算法。密钥长度是64位(bit)，超过位数密钥被忽略。所谓对称性加密即加密和解密密钥相同，对称性加密一般会按照固定长度，把待加密字符串分成块，不足一整块或者刚好最后有特殊填充字符。  跨语言做 DES 加密解密经常会出现问题，往往是填充方式不对、编码不一致">
+<meta name="keywords" content="openssl_encrypt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openssl_encrypt加密解密">
+<meta property="og:url" content="http://yoursite.com/2019/11/22/openssl-encrypt加密解密/index.html">
+<meta property="og:site_name" content="Gumery&#39;s Blog">
+<meta property="og:description" content="一、DES介绍DES 是对称性加密里面常见一种，全称为 Data Encryption Standard，即数据加密标准，是一种使用密钥加密的块算法。密钥长度是64位(bit)，超过位数密钥被忽略。所谓对称性加密即加密和解密密钥相同，对称性加密一般会按照固定长度，把待加密字符串分成块，不足一整块或者刚好最后有特殊填充字符。  跨语言做 DES 加密解密经常会出现问题，往往是填充方式不对、编码不一致">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-22T08:07:42.569Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="openssl_encrypt加密解密">
+<meta name="twitter:description" content="一、DES介绍DES 是对称性加密里面常见一种，全称为 Data Encryption Standard，即数据加密标准，是一种使用密钥加密的块算法。密钥长度是64位(bit)，超过位数密钥被忽略。所谓对称性加密即加密和解密密钥相同，对称性加密一般会按照固定长度，把待加密字符串分成块，不足一整块或者刚好最后有特殊填充字符。  跨语言做 DES 加密解密经常会出现问题，往往是填充方式不对、编码不一致">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/22/openssl-encrypt加密解密/">
+
+
+
+
+
+  <title>openssl_encrypt加密解密 | Gumery's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Gumery's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">高小相的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/22/openssl-encrypt加密解密/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="高小相">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Gumery's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">openssl_encrypt加密解密</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-22T16:03:02+08:00">
+                2019-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/" itemprop="url" rel="index">
+                    <span itemprop="name">PHP</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/openssl-encrypt/" itemprop="url" rel="index">
+                    <span itemprop="name">openssl_encrypt</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="一、DES介绍"><a href="#一、DES介绍" class="headerlink" title="一、DES介绍"></a>一、DES介绍</h3><p>DES 是对称性加密里面常见一种，全称为 Data Encryption Standard，即数据加密标准，是一种使用密钥加密的块算法。密钥长度是64位(bit)，超过位数密钥被忽略。所谓对称性加密即加密和解密密钥相同，对称性加密一般会按照固定长度，把待加密字符串分成块，不足一整块或者刚好最后有特殊填充字符。</p>
+<ul>
+<li>跨语言做 DES 加密解密经常会出现问题，往往是填充方式不对、编码不一致或者加密解密模式没有对应上造成。</li>
+<li>常见的填充模式有： pkcs5、pkcs7、iso10126、ansix923、zero。</li>
+<li>加密模式有：DES-ECB、DES-CBC、DES-CTR、DES-OFB、DES-CFB。</li>
+</ul>
+<h3 id="加密用到的方法："><a href="#加密用到的方法：" class="headerlink" title="加密用到的方法："></a>加密用到的方法：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl_encrypt($data, $method, $password, $options, $iv)</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>参数说明：</p>
+<ol>
+<li>$data 加密明文</li>
+<li>$method 加密方法<ul>
+<li>DES-ECB</li>
+<li>DES-CBC</li>
+<li>DES-CTR</li>
+<li>DES-OFB</li>
+<li>DES-CFB</li>
+</ul>
+</li>
+<li>$passwd 加密密钥[密码]</li>
+<li>$options 数据格式选项（可选）【选项有：】<ul>
+<li>0</li>
+<li>OPENSSL_RAW_DATA=1</li>
+<li>OPENSSL_ZERO_PADDING=2</li>
+<li>OPENSSL_NO_PADDING=3</li>
+</ul>
+</li>
+<li>$iv 密初始化向量（可选）</li>
+</ol>
+<ul>
+<li><h5 id="需要注意：如果-method为DES-ECB，则-iv无需填写"><a href="#需要注意：如果-method为DES-ECB，则-iv无需填写" class="headerlink" title="需要注意：如果$method为DES-ECB，则$iv无需填写"></a>需要注意：如果$method为DES-ECB，则$iv无需填写</h5></li>
+</ul>
+<h3 id="二、解密用到的方法："><a href="#二、解密用到的方法：" class="headerlink" title="二、解密用到的方法："></a>二、解密用到的方法：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl_decrypt($data, $method, $password, $options, $iv)</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ol>
+<li>$data 要解密的数据</li>
+<li>其他参数同加密方法</li>
+</ol>
+<h3 id="三、用法案例："><a href="#三、用法案例：" class="headerlink" title="三、用法案例："></a>三、用法案例：</h3><p>参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$data = &apos;1234567887654321&apos;;//加密明文</span><br><span class="line">$method = &apos;DES-ECB&apos;;//加密方法</span><br><span class="line">$passwd = &apos;12344321&apos;;//加密密钥</span><br><span class="line">$options = 0;//数据格式选项（可选）</span><br><span class="line">$iv = &apos;&apos;;//加密初始化向量（可选）</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-默认填充方式："><a href="#1-默认填充方式：" class="headerlink" title="(1) 默认填充方式："></a>(1) 默认填充方式：</h4><ul>
+<li><p>加密：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = openssl_encrypt($data, $method, $passwd, $options);</span><br><span class="line">var_dump($result);</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(32) &quot;kQYOdswcm9I5elv2wdJucplqAgqDNqXg&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = &apos;kQYOdswcm9I5elv2wdJucplqAgqDNqXg&apos;;</span><br><span class="line">var_dump(openssl_decrypt($result, $method, $passwd, 0));</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(16) &quot;1234567887654321&quot;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="2-OPENSSL-RAW-DATA方式【会用PKCS-7进行补位】"><a href="#2-OPENSSL-RAW-DATA方式【会用PKCS-7进行补位】" class="headerlink" title="(2) OPENSSL_RAW_DATA方式【会用PKCS#7进行补位】"></a>(2) OPENSSL_RAW_DATA方式【会用PKCS#7进行补位】</h4><ul>
+<li><p>加密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = openssl_encrypt($data, $method, $passwd, OPENSSL_RAW_DATA);</span><br><span class="line">var_dump($result);</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(24) &quot;�v���9z[���nr�j �6��&quot;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到结果是乱码的，这时我们需要base64一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = openssl_encrypt($data, $method, $passwd, OPENSSL_RAW_DATA);</span><br><span class="line">var_dump(base64_encode($result));</span><br></pre></td></tr></table></figure>
+
+<p>这时结果是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(32) &quot;kQYOdswcm9I5elv2wdJucplqAgqDNqXg&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">result = openssl_encrypt($data, $method, $passwd, OPENSSL_RAW_DATA);</span><br><span class="line"></span><br><span class="line">var_dump(openssl_decrypt($result, $method, $passwd,OPENSSL_RAW_DATA));</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(16) &quot;1234567887654321&quot;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到：默认填充方式与OPENSSL_RAW_DATA，这两种方式加密结果是一样的</p>
+</li>
+</ul>
+<h4 id="3-OPENSSL-ZERO-PADDING方式"><a href="#3-OPENSSL-ZERO-PADDING方式" class="headerlink" title="(3) OPENSSL_ZERO_PADDING方式"></a>(3) OPENSSL_ZERO_PADDING方式</h4><p>看字面意思，是用0填充，但是测试并不起作用</p>
+<ul>
+<li><p>加密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = openssl_encrypt($data, $method, $passwd, OPENSSL_ZERO_PADDING);</span><br><span class="line">var_dump($result);</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(24) &quot;kQYOdswcm9I5elv2wdJucg==&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解密：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$result = openssl_encrypt($data, $method, $passwd, OPENSSL_ZERO_PADDING);</span><br><span class="line">var_dump(openssl_decrypt($result, $method, $passwd,OPENSSL_ZERO_PADDING));</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(16) &quot;1234567887654321&quot;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="4-OPENSSL-NO-PADDING【不填充，需要手动填充】"><a href="#4-OPENSSL-NO-PADDING【不填充，需要手动填充】" class="headerlink" title="(4) OPENSSL_NO_PADDING【不填充，需要手动填充】"></a>(4) OPENSSL_NO_PADDING【不填充，需要手动填充】</h4><ul>
+<li><p>在openssl_encrypt前加上填充过程</p>
+</li>
+<li><p>加密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$str_padded = $data;</span><br><span class="line">if (strlen($str_padded) % 16) &#123;</span><br><span class="line">    $str_padded = str_pad($str_padded,strlen($str_padded) + 16 - strlen($str_padded) % 16, &quot;\0&quot;);</span><br><span class="line">&#125;</span><br><span class="line">$result = openssl_encrypt($str_padded, $method, $passwd, OPENSSL_NO_PADDING);</span><br><span class="line">var_dump($result);</span><br><span class="line">echo &apos;&lt;br&gt;&apos;;</span><br><span class="line">var_dump( base64_encode($result));</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">string(16) &quot;�v���9z[���nr&quot; </span><br><span class="line">string(24) &quot;kQYOdswcm9I5elv2wdJucg==&quot;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到结果是加密的乱码，需要用base64一下，就可以看到结果了</p>
+</li>
+<li><p>解密：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//加密begin</span><br><span class="line"> $str_padded = $data;</span><br><span class="line"> if (strlen($str_padded) % 16) &#123;</span><br><span class="line">     $str_padded = str_pad($str_padded,strlen($str_padded) + 16 - strlen($str_padded) % 16, &quot;\0&quot;);</span><br><span class="line"> &#125;</span><br><span class="line"> $result = openssl_encrypt($str_padded, $method, $passwd, OPENSSL_NO_PADDING);</span><br><span class="line"> //加密end</span><br><span class="line">//解密begin</span><br><span class="line">$str = base64_encode($result);</span><br><span class="line">$m = openssl_decrypt( base64_decode($str) , $method, $passwd, OPENSSL_NO_PADDING);</span><br><span class="line">var_dump( rtrim( rtrim( $m,chr(0) ), chr(7) ) );</span><br><span class="line">//解密 end</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string(16) &quot;1234567887654321&quot;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>** 结尾要去除填充字符’0’和’a’。<br>‘a’是为了兼容用OPENSSL_RAW_DATA加密的结果。 **</p>
+<p>来源：<a href="https://segmentfault.com/a/1190000016804661" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016804661</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/openssl-encrypt/" rel="tag"># openssl_encrypt</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/07/批量手机号请求短信服务/" rel="next" title="批量手机号请求短信服务">
+                <i class="fa fa-chevron-left"></i> 批量手机号请求短信服务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">高小相</p>
+              <p class="site-description motion-element" itemprop="description">This is my world!</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、DES介绍"><span class="nav-number">1.</span> <span class="nav-text">一、DES介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加密用到的方法："><span class="nav-number">2.</span> <span class="nav-text">加密用到的方法：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#需要注意：如果-method为DES-ECB，则-iv无需填写"><span class="nav-number">2.0.1.</span> <span class="nav-text">需要注意：如果$method为DES-ECB，则$iv无需填写</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#二、解密用到的方法："><span class="nav-number">3.</span> <span class="nav-text">二、解密用到的方法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、用法案例："><span class="nav-number">4.</span> <span class="nav-text">三、用法案例：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-默认填充方式："><span class="nav-number">4.1.</span> <span class="nav-text">(1) 默认填充方式：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-OPENSSL-RAW-DATA方式【会用PKCS-7进行补位】"><span class="nav-number">4.2.</span> <span class="nav-text">(2) OPENSSL_RAW_DATA方式【会用PKCS#7进行补位】</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-OPENSSL-ZERO-PADDING方式"><span class="nav-number">4.3.</span> <span class="nav-text">(3) OPENSSL_ZERO_PADDING方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-OPENSSL-NO-PADDING【不填充，需要手动填充】"><span class="nav-number">4.4.</span> <span class="nav-text">(4) OPENSSL_NO_PADDING【不填充，需要手动填充】</span></a></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">高小相</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
